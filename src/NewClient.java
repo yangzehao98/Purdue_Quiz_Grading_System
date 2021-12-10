@@ -60,18 +60,22 @@ public class NewClient implements Runnable {
     private static final String ERROR_MESSAGE = "Please enter a valid number.";
     private static final String THANK_YOU_MESSAGE = "Thank you for using our online quiz tool!";
 
-
+    public static void main(String[] args) {
+        new NewClient().run();
+    }
     public void run() {
         try {
-            socket = new Socket("localhost", 2345);
+            socket = new Socket("127.0.0.1", 4242);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
              InputStream is = socket.getInputStream();
-             ObjectInputStream ois = new ObjectInputStream(is);
+
              ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream())) {
+
 
 
             ActionListener action = new ActionListener() {
@@ -809,6 +813,12 @@ public class NewClient implements Runnable {
                         }
 
                         Quiz quiz = new Quiz();
+                        ObjectInputStream ois = null;
+                        try {
+                            ois = new ObjectInputStream(is);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                         try {
                             quiz = (Quiz) ois.readObject();
                         } catch (IOException | ClassNotFoundException ex) {
@@ -1002,7 +1012,7 @@ public class NewClient implements Runnable {
             signInFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             signInFrame.setVisible(true);
 
-            if (signInContinue.equals("true")) {
+            if (signInContinue!=null&&signInContinue.equals("true")) {
                 signInFrame.dispose();
                 if (teacher) {
                     // Teacher Menu
@@ -1048,7 +1058,9 @@ public class NewClient implements Runnable {
             }
 
 
-        } catch (UnknownHostException e) {
+        }
+
+        catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -1093,7 +1105,5 @@ public class NewClient implements Runnable {
                 "Online Quiz Tool", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void main(String []args){
-        new NewClient().run();
-    }
+
 }
